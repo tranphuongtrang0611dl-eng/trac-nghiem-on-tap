@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ôn tập giữa kì I - Lớp 7</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#182235;--muted:#64748b;--brand:#3157d5;--brand2:#6b82ed;--line:#e4e9f2;--good:#16834a;--bad:#c43d46;--soft:#eef2ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:linear-gradient(120deg,#243f9c,#6379e8);color:white;padding:28px 18px 34px}
+.wrap{max-width:1050px;margin:auto;padding:0 16px}h1{font-size:clamp(24px,4vw,36px);margin:0 0 6px}header p{margin:0;color:#e8edff}
+main{margin-top:-18px;padding-bottom:48px}.panel,.question{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 5px 20px #1b2b4d0a}
+.panel{padding:18px;margin-bottom:16px}.tabs{display:flex;gap:10px;flex-wrap:wrap}
+button,select{font:inherit}button{border:0;border-radius:10px;padding:10px 15px;background:var(--brand);color:white;cursor:pointer;font-weight:650}
+button:hover{filter:brightness(1.06)}button:disabled{opacity:.45;cursor:not-allowed}
+.tab{background:#edf1fa;color:#33415e}.tab.active{background:var(--brand);color:white}
+.controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:14px}
+select{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--ink)}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.pill{background:#f0f3fa;border-radius:999px;padding:6px 11px;color:#46536d;font-size:14px}
+.progress{height:8px;background:#e9edf6;border-radius:99px;overflow:hidden;margin-top:14px}.bar{height:100%;background:#6379e8;width:0;transition:width .2s}
+.question{padding:18px;margin:14px 0}.qhead{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:14px}.question h3{font-size:17px;margin:9px 0 14px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:11px;padding:10px 12px;margin:8px 0;cursor:pointer}
+.opt:hover{background:#f8f9ff}.opt input{margin-top:5px;accent-color:var(--brand)}.opt.correct{border-color:#8ed1a8;background:#effaf3}.opt.wrong{border-color:#efa0a4;background:#fff3f3}
+input.short{width:100%;max-width:300px;padding:11px;border:1px solid var(--line);border-radius:10px;font:inherit}
+.feedback{font-size:14px;margin-top:10px;color:var(--muted)}.feedback.good{color:var(--good)}.feedback.bad{color:var(--bad)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.secondary{background:#e9eefb;color:#273b78}.danger{background:#a83c46}
+#result{display:none}.score{font-size:32px;font-weight:800;color:var(--brand)}.muted{color:var(--muted)}.notice{background:#fff8e8;border:1px solid #f4dfaa;color:#795b18;padding:12px 14px;border-radius:12px;font-size:14px}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:18px}
+@media(max-width:600px){.panel{padding:14px}.question{padding:14px}.qhead{display:block}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><h1>Ôn tập giữa kì I · Lớp 7</h1><p>Website luyện tập trắc nghiệm — Vật lý 7, Hóa học 7 và Sinh học 7</p></div></header>
+<main class="wrap">
+<section class="panel">
+ <div class="tabs" id="tabs">
+  <button class="tab active" data-subject="physics">⚡ Vật lý 7</button>
+  <button class="tab" data-subject="chemistry">⚗️ Hóa học 7</button>
+  <button class="tab" data-subject="biology">🌱 Sinh học 7</button>
+  <button class="tab" data-subject="all">📚 Cả 3 môn</button>
+ </div>
+ <div class="controls">
+  <label for="mode">Dạng bài:</label><select id="mode"><option value="all">Tất cả dạng câu hỏi</option><option value="mc">Chọn đáp án</option><option value="tf">Đúng / Sai</option><option value="short">Trả lời ngắn</option></select>
+  <label for="count">Số câu:</label><select id="count"><option value="all">Tất cả</option><option>10</option><option>15</option><option>20</option></select>
+  <button id="start">Tạo bài luyện tập</button>
+ </div>
+ <div class="stats"><span class="pill" id="subjectLabel">Đang chọn: Vật lý 7</span><span class="pill" id="questionCount">0 câu</span><span class="pill">Tự chấm điểm</span></div>
+ <div class="progress"><div class="bar" id="bar"></div></div>
+</section>
+<div class="notice" id="notice">Bài tập được biên soạn từ các trang đề cương bạn gửi. Một số câu cần hình đồ thị không có đủ hình trong tài liệu nên chưa đưa vào bài tự chấm.</div>
+<section id="quiz"></section>
+<section class="panel" id="submitPanel">
+ <div class="actions"><button id="submit">Nộp bài và xem điểm</button><button class="secondary" id="reset">Làm lại / đổi đề</button><span class="muted" id="answered">Đã trả lời 0 câu</span></div>
+</section>
+<section class="panel" id="result">
+ <div class="muted">KẾT QUẢ BÀI LÀM</div><div class="score" id="score"></div><p id="summary"></p><div class="actions"><button id="review" class="secondary">Xem đáp án và lời giải</button><button id="again">Làm bài khác</button></div>
+ <div id="reviewArea"></div>
+</section>
+</main>
+<footer>Ôn tập kiến thức lớp 7 · Chúc bạn học tốt!</footer>
+<script>
+const bank = {
+physics:[
+{type:'mc',q:'Từ đồ thị quãng đường – thời gian, ta không thể xác định được thông tin nào?',o:['Thời gian chuyển động','Quãng đường đi được','Tốc độ chuyển động','Hướng chuyển động'],a:3,e:'Đồ thị quãng đường – thời gian cho biết quãng đường, thời gian và tốc độ; không cho biết hướng chuyển động.'},
+{type:'mc',q:'Công thức dùng để tính tốc độ chuyển động là gì?',o:['v = s × t','v = s / t','v = t / s','v = s + t'],a:1,e:'Tốc độ bằng quãng đường chia cho thời gian: v = s/t.'},
+{type:'mc',q:'Một đoàn tàu đi 30 km trong 0,5 giờ. Tốc độ của đoàn tàu là:',o:['60 km/h','40 km/h','50 km/h','55 km/h'],a:0,e:'v = 30 / 0,5 = 60 km/h.'},
+{type:'mc',q:'Đơn vị đo tốc độ là:',o:['km·h','m·s','km/h','s/m'],a:2,e:'Các đơn vị thường dùng là m/s và km/h.'},
+{type:'mc',q:'Một học sinh chạy 1.000 m trong 2 phút 5 giây. Tốc độ của học sinh là:',o:['40 m/s','8 m/s','4,88 m/s','120 m/s'],a:1,e:'2 phút 5 giây = 125 s; v = 1000/125 = 8 m/s.'},
+{type:'mc',q:'Để xác định tốc độ của một vật đang chuyển động, cần biết:',o:['Thời gian và vật chuyển động','Thời gian và vạch xuất phát','Thời gian và vạch đích','Thời gian và quãng đường vật đi được'],a:3,e:'Cần đo quãng đường vật đi được và thời gian đi hết quãng đường đó.'},
+{type:'mc',q:'Tốc độ chuyển động của vật cho biết:',o:['Hướng chuyển động','Quỹ đạo chuyển động','Vật chuyển động nhanh hay chậm','Nguyên nhân vật chuyển động'],a:2,e:'Tốc độ đặc trưng cho mức độ nhanh hay chậm của chuyển động.'},
+{type:'mc',q:'Đồ thị của chuyển động có tốc độ không đổi là một đường:',o:['Thẳng','Cong','Zíc zắc','Không xác định'],a:0,e:'Theo đề cương, đồ thị chuyển động có tốc độ không đổi là đường thẳng.'},
+...[
+['Tốc độ là đại lượng đặc trưng cho mức độ nhanh hay chậm của chuyển động.',true],
+['Hai vật đi cùng quãng đường, vật mất ít thời gian hơn thì có tốc độ lớn hơn.',true],
+['Tốc độ 10 m/s nghĩa là mỗi giây vật đi được 10 m.',true],
+['Muốn xác định tốc độ cần đo quãng đường và thời gian chuyển động.',true],
+['Đồng hồ bấm giây thường dùng để đo thời gian trong thí nghiệm đo tốc độ.',true],
+['Trong thí nghiệm đo tốc độ, người quan sát không cần nhìn rõ điểm xuất phát và điểm kết thúc.',false],
+['Đồ thị quãng đường – thời gian luôn là một đường cong.',false],
+['Trên đồ thị quãng đường – thời gian, không cần ghi đơn vị trên các trục tọa độ.',false]
+].map(x=>({type:'tf',q:x[0],a:x[1],e:x[1]?'Nhận định đúng theo kiến thức về tốc độ.':'Nhận định sai: cần quan sát rõ mốc và ghi đơn vị trên các trục; đồ thị không phải lúc nào cũng là đường cong.'})),
+{type:'short',q:'Một học sinh đi bộ 600 m trong 5 phút. Tốc độ bằng bao nhiêu m/s?',a:2,unit:'m/s',e:'5 phút = 300 s; v = 600/300 = 2 m/s.'},
+{type:'short',q:'Xe đạp chuyển động với tốc độ 10 m/s trong 30 s. Xe đi được bao nhiêu mét?',a:300,unit:'m',e:'s = v × t = 10 × 30 = 300 m.'},
+{type:'short',q:'Một người chạy với tốc độ 5 m/s trong 2 phút. Người đó chạy được bao nhiêu mét?',a:600,unit:'m',e:'2 phút = 120 s; s = 5 × 120 = 600 m.'},
+{type:'short',q:'Đổi tốc độ 54 km/h ra m/s.',a:15,unit:'m/s',e:'54 ÷ 3,6 = 15 m/s.'},
+{type:'short',q:'Đổi tốc độ 10 m/s ra km/h.',a:36,unit:'km/h',e:'10 × 3,6 = 36 km/h.'},
+{type:'short',q:'Ô tô chạy 72 km/h. Theo quy tắc 3 giây, khoảng cách an toàn tối thiểu là bao nhiêu mét?',a:60,unit:'m',e:'72 km/h = 20 m/s; khoảng cách = 20 × 3 = 60 m.'},
+{type:'short',q:'Thanh thép dao động làm vật nhỏ tiếp xúc với nó dao động, rồi chạm vào mặt nước tạo sóng. Có bao nhiêu vật dao động?',a:3,unit:'vật',e:'Đầu thanh thép, vật nhỏ và mặt nước đều dao động theo mô tả.'},
+{type:'short',q:'Trong ba hiện tượng: sóng mặt nước khi thả sỏi; sóng dọc trên lò xo; xe đạp chuyển động đều. Có bao nhiêu hiện tượng là sự truyền dao động tạo thành sóng?',a:2,unit:'hiện tượng',e:'Hai hiện tượng đầu là sóng; xe đạp chuyển động đều không phải sự truyền dao động tạo thành sóng.'}
+],
+chemistry:[
+{type:'mc',q:'Chọn các mẫu vật, dữ liệu có đặc điểm chung giống nhau để sắp xếp thành nhóm là kĩ năng nào?',o:['Kĩ năng phân loại','Kĩ năng liên kết','Kĩ năng dự báo','Kĩ năng đo'],a:0,e:'Đó là kĩ năng phân loại.'},
+{type:'mc',q:'Ước lượng giá trị cần đo, chọn dụng cụ thích hợp, tiến hành đo và ghi kết quả là kĩ năng nào?',o:['Kĩ năng phân loại','Kĩ năng liên kết','Kĩ năng dự báo','Kĩ năng đo'],a:3,e:'Đó là kĩ năng đo.'},
+{type:'mc',q:'Sử dụng kiến thức khoa học, phần mềm và công cụ toán học để tìm mối liên hệ giữa sự vật, hiện tượng là kĩ năng nào?',o:['Kĩ năng dự báo','Kĩ năng phân loại','Kĩ năng liên kết','Kĩ năng đo'],a:2,e:'Đó là kĩ năng liên kết.'},
+{type:'mc',q:'Dự báo thời gian cây trưởng thành, thu hoạch hoặc dự báo thời tiết dựa trên quy luật trước đó là kĩ năng nào?',o:['Kĩ năng dự báo','Kĩ năng phân loại','Kĩ năng liên kết','Kĩ năng đo'],a:0,e:'Đó là kĩ năng dự báo.'},
+{type:'mc',q:'Trong bộ dụng cụ đo thời gian chuyển động, cổng quang điện dùng để làm gì?',o:['Phóng đại hình ảnh của vật','Phát hiện vật đi qua để báo hiệu đồng hồ bắt đầu hoặc dừng đếm','Đo khối lượng của vật','Đo nhiệt độ của vật'],a:1,e:'Cổng quang điện phát hiện vật đi qua để điều khiển đồng hồ.'},
+{type:'mc',q:'Đồng hồ đo thời gian dùng cổng quang điện gồm những bộ phận chính nào?',o:['Đồng hồ hiện số và nam châm điện','Đồng hồ đeo tay và nam châm điện','Đồng hồ hiện số và cổng quang điện','Đồng hồ đeo tay và cổng quang điện'],a:2,e:'Gồm đồng hồ đo thời gian hiện số và cổng quang điện.'},
+{type:'mc',q:'Phát biểu nào sau đây đúng?',o:['Nguyên tử là hạt vô cùng nhỏ, tạo nên các chất.','Hạt nhân nguyên tử được tạo bởi proton và electron.','Hạt nhân nguyên tử chứa proton mang điện tích âm.','Trong một nguyên tử, số electron luôn bằng số proton và số neutron.'],a:0,e:'Nguyên tử là hạt vô cùng nhỏ, cấu tạo nên các chất.'},
+{type:'mc',q:'Nhận định nào sau đây là sai?',o:['Hạt nhân nguyên tử được cấu tạo nên bởi proton, electron và neutron.','Số đơn vị điện tích hạt nhân bằng số proton.','Electron ở vỏ được xếp thành từng lớp và chuyển động xung quanh hạt nhân.','Nguyên tử trung hòa về điện.'],a:0,e:'Hạt nhân gồm proton và neutron; electron thuộc lớp vỏ nguyên tử.'},
+{type:'mc',q:'Cho các phát biểu: (1) số proton bằng số electron trong nguyên tử trung hòa; (2) điện tích hạt nhân bằng tổng điện tích proton; (3) khối lượng hạt nhân được coi gần bằng khối lượng nguyên tử; (4) proton và electron có khối lượng xấp xỉ bằng nhau. Có bao nhiêu phát biểu đúng?',o:['1','2','3','4'],a:2,e:'(1), (2), (3) đúng; (4) sai vì proton nặng hơn electron rất nhiều.'},
+{type:'mc',q:'Nguyên tử Sodium có 11 proton. Theo mô hình Rutherford–Bohr, số electron lớp ngoài cùng là:',o:['1','8','2','3'],a:0,e:'Sodium có cấu hình electron 2–8–1 nên lớp ngoài cùng có 1 electron.'},
+{type:'tf',q:'Các electron của nitrogen (Z = 7) phân bố thành 2 lớp, lớp thứ nhất chứa 2 electron.',a:true,e:'Đúng: cấu hình electron của nitrogen là 2–5.'},
+{type:'tf',q:'Nitrogen có 7 proton nên điện tích hạt nhân là +7.',a:true,e:'Đúng: điện tích hạt nhân bằng số proton, tính theo đơn vị điện tích nguyên tố.'},
+{type:'tf',q:'Nguyên tử nitrogen có 7 proton và 7 neutron nên số khối là 7 amu.',a:false,e:'Sai: số khối = 7 + 7 = 14.'},
+{type:'tf',q:'Nguyên tử nitrogen có 7 electron nên trung hòa về điện.',a:true,e:'Đúng: số electron bằng số proton.'},
+{type:'short',q:'Nguyên tử phosphorus có 15 proton và 16 neutron. Khối lượng nguyên tử gần đúng là bao nhiêu amu?',a:31,unit:'amu',e:'Số khối gần bằng tổng proton và neutron: 15 + 16 = 31.'},
+{type:'short',q:'Nguyên tử phosphorus có 15 proton. Theo mô hình Rutherford–Bohr, lớp electron ngoài cùng có bao nhiêu electron?',a:5,unit:'electron',e:'Phosphorus có cấu hình electron 2–8–5.'}
+],
+biology:[
+{type:'mc',q:'Sinh vật có thể tồn tại, sinh trưởng, phát triển và thích nghi với môi trường sống là nhờ quá trình nào?',o:['Trao đổi chất và sinh sản','Chuyển hóa năng lượng','Trao đổi chất và chuyển hóa năng lượng','Trao đổi chất và cảm ứng'],a:2,e:'Sinh vật cần trao đổi chất và chuyển hóa năng lượng.'},
+{type:'mc',q:'Nguồn năng lượng chủ yếu cung cấp cho các hoạt động sống của động vật và người có trong:',o:['Nước uống','Thức ăn','Khí carbon dioxide','Chất thải'],a:1,e:'Thức ăn cung cấp năng lượng hóa học cho động vật và người.'},
+{type:'mc',q:'Ở thực vật, chất khí tham gia vào quá trình chuyển hóa quang năng thành hóa năng là:',o:['Oxygen','Carbon dioxide','Muối khoáng','Nước'],a:1,e:'Carbon dioxide là nguyên liệu của quá trình quang hợp.'},
+{type:'mc',q:'Nguồn năng lượng chủ yếu trong cơ thể động vật là:',o:['Hóa năng','Động năng','Điện năng','Quang năng'],a:0,e:'Năng lượng trong thức ăn được tích lũy dưới dạng hóa năng.'},
+{type:'mc',q:'Mối quan hệ giữa trao đổi chất và chuyển hóa năng lượng là:',o:['Hai quá trình hoàn toàn độc lập','Chỉ thực vật mới có cả hai quá trình','Chuyển hóa năng lượng chỉ xảy ra khi cơ thể ngủ','Trao đổi chất luôn đi kèm với chuyển hóa năng lượng'],a:3,e:'Hai quá trình diễn ra gắn liền với nhau.'},
+...[
+['Trao đổi chất là quá trình cơ thể lấy các chất từ môi trường và thải các chất ra môi trường.',true],
+['Chuyển hóa năng lượng là quá trình biến đổi năng lượng từ dạng này sang dạng khác.',true],
+['Trao đổi chất và chuyển hóa năng lượng giúp cơ thể sinh vật tồn tại và phát triển.',true],
+['Sinh vật không cần trao đổi chất với môi trường vẫn có thể sống và phát triển bình thường.',false],
+['Sinh vật lấy các chất cần thiết từ môi trường để duy trì sự sống.',true],
+['Trao đổi chất và chuyển hóa năng lượng không có vai trò đối với sự sinh trưởng của sinh vật.',false],
+['Cây ưa sáng có nhu cầu ánh sáng thấp.',false],
+['Cường độ quang hợp luôn tỉ lệ thuận với cường độ ánh sáng trong mọi điều kiện.',false],
+['Nước không cần thiết cho quá trình quang hợp của thực vật.',false],
+['Nhiệt độ không ảnh hưởng đến quá trình quang hợp của cây xanh.',false],
+['Không có quang hợp thì không có sự sống trên Trái Đất.',true]
+].map(x=>({type:'tf',q:x[0],a:x[1],e:x[1]?'Nhận định đúng theo nội dung đề cương.':'Nhận định sai: trao đổi chất/quang hợp chịu ảnh hưởng của các điều kiện môi trường và rất cần thiết cho sự sống.'}))
+]
+};
+const names={physics:'Vật lý 7',chemistry:'Hóa học 7',biology:'Sinh học 7',all:'Cả 3 môn'};
+let subject='physics',questions=[],submitted=false,showReview=false;
+const $=id=>document.getElementById(id);
+function allQuestions(){return subject==='all'?['physics','chemistry','biology'].flatMap(k=>bank[k].map(q=>({...q,subject:k}))):bank[subject].map(q=>({...q,subject}));}
+function render(){
+ const mode=$('mode').value,count=$('count').value;
+ let list=allQuestions().filter(q=>mode==='all'||q.type===mode);
+ if(count!=='all') list=list.slice(0,Number(count));
+ questions=list;submitted=false;showReview=false;
+ $('result').style.display='none';$('submitPanel').style.display='block';
+ $('subjectLabel').textContent='Đang chọn: '+names[subject];$('questionCount').textContent=questions.length+' câu';
+ $('notice').style.display=subject==='physics'?'block':'none';
+ $('quiz').innerHTML=questions.map((q,i)=>questionHTML(q,i,false)).join('');
+ $('bar').style.width='0%';updateAnswered();
+}
+function questionHTML(q,i,review){
+ let label=q.type==='mc'?'Chọn một đáp án':q.type==='tf'?'Đúng hay Sai':'Trả lời ngắn';
+ let html=`<article class="question" id="q${i}"><div class="qhead"><span>Câu ${i+1} · ${names[q.subject]}</span><span>${label}</span></div><h3>${q.q}</h3>`;
+ if(q.type==='mc') html+=q.o.map((v,j)=>`<label class="opt" data-opt="${j}"><input type="radio" name="ans${i}" value="${j}" ${review&&q.user===j?'checked':''} ${submitted?'disabled':''}><span><b>${'ABCD'[j]}.</b> ${v}</span></label>`).join('');
+ if(q.type==='tf') html+=`<label class="opt"><input type="radio" name="ans${i}" value="true" ${review&&q.user===true?'checked':''} ${submitted?'disabled':''}><span>Đúng</span></label><label class="opt"><input type="radio" name="ans${i}" value="false" ${review&&q.user===false?'checked':''} ${submitted?'disabled':''}><span>Sai</span></label>`;
+ if(q.type==='short') html+=`<input class="short" id="ans${i}" type="text" placeholder="Nhập kết quả${q.unit?' ('+q.unit+')':''}" value="${review&&q.user!==undefined?q.user:''}" ${submitted?'disabled':''}> <span class="muted">${q.unit||''}</span>`;
+ if(review){let ok=isCorrect(q);html+=`<div class="feedback ${ok?'good':'bad'}">${ok?'✓ Chính xác':'✗ Chưa chính xác'} · Đáp án: <b>${answerText(q)}</b><br>${q.e}</div>`;}
+ html+='</article>';return html;
+}
+function answerText(q){return q.type==='mc'?'ABCD'[q.a]+'. '+q.o[q.a]:q.type==='tf'?(q.a?'Đúng':'Sai'):q.a+' '+(q.unit||'');}
+function readAnswers(){questions.forEach((q,i)=>{if(q.type==='mc'){let el=document.querySelector(`input[name="ans${i}"]:checked`);q.user=el?Number(el.value):undefined;}else if(q.type==='tf'){let el=document.querySelector(`input[name="ans${i}"]:checked`);q.user=el?el.value==='true':undefined;}else{let el=$('ans'+i);q.user=el&&el.value.trim()!==''?el.value.trim():undefined;}});}
+function isCorrect(q){if(q.user===undefined)return false;if(q.type==='short'){let n=Number(String(q.user).replace(',','.').replace(/[^\d.-]/g,''));return Number.isFinite(n)&&Math.abs(n-q.a)<0.001;}return q.user===q.a;}
+function updateAnswered(){readAnswers();let n=questions.filter(q=>q.user!==undefined).length;$('answered').textContent=`Đã trả lời ${n}/${questions.length} câu`;$('bar').style.width=(questions.length?n/questions.length*100:0)+'%';}
+function submit(){if(submitted)return;readAnswers();let correct=questions.filter(isCorrect).length;submitted=true;questions.forEach((q,i)=>{$('q'+i).outerHTML=questionHTML(q,i,true);let card=$('q'+i);card.querySelectorAll('.opt').forEach((el,j)=>{if(q.type==='mc'&&j===q.a)el.classList.add('correct');if(q.type==='tf'&&j===(q.a?0:1))el.classList.add('correct');});});$('submitPanel').style.display='none';$('result').style.display='block';$('score').textContent=`${correct}/${questions.length} câu đúng · ${questions.length?Math.round(correct/questions.length*10*10)/10:0}/10 điểm`;$('summary').textContent=`Bạn đã trả lời ${questions.filter(q=>q.user!==undefined).length} trên ${questions.length} câu. Xem phần đáp án bên dưới để ôn lại kiến thức.`;$('reviewArea').innerHTML='<h3>Đáp án và giải thích</h3>'+questions.map((q,i)=>`<p><b>Câu ${i+1} (${names[q.subject]}):</b> ${answerText(q)}<br><span class="muted">${q.e}</span></p>`).join('');}
+$('tabs').addEventListener('click',e=>{let b=e.target.closest('button[data-subject]');if(!b)return;subject=b.dataset.subject;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));render();});
+$('start').onclick=render;$('reset').onclick=render;$('submit').onclick=submit;$('again').onclick=()=>{render();window.scrollTo({top:0,behavior:'smooth'});};
+$('quiz').addEventListener('change',updateAnswered);$('quiz').addEventListener('input',updateAnswered);
+render();
+</script>
+</body></html>
